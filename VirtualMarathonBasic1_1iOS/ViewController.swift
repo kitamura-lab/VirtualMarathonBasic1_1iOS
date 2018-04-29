@@ -60,22 +60,25 @@ class ViewController: UIViewController {
         view = mapView
         
         label.text = "00:00:00"
-        label.sizeToFit()
-        label.frame.origin = CGPoint(x: 100, y: 30)
+        //label.sizeToFit()
+        //label.frame.origin = CGPoint(x: 100, y: 30)
+        label.frame = CGRect(x:130, y:30, width:100, height:30);
         label.backgroundColor = UIColor.white
         view.addSubview(label)
         
         dlabel.text = "000.00"
-        dlabel.sizeToFit()
-        dlabel.frame.origin = CGPoint(x: 200, y: 30)
+        //dlabel.sizeToFit()
+        //dlabel.frame.origin = CGPoint(x: 200, y: 30)
+        dlabel.frame = CGRect(x:240, y:30, width:100, height:30);
         dlabel.backgroundColor = UIColor.white
         view.addSubview(dlabel)
         
         button.setTitle("START", for: .normal)
         button.backgroundColor = UIColor.white
         button.setTitleColor(UIColor.black, for: .normal)
-        button.sizeToFit()
-        button.frame.origin = CGPoint(x: 20, y: 30)
+        button.frame = CGRect(x:20, y:30, width:100, height:30);
+        //button.sizeToFit()
+        //button.frame.origin = CGPoint(x: 20, y: 30)
         button.addTarget(self, action: #selector(buttonEvent(sender:)), for: .touchUpInside)
         view.addSubview(button)
     }
