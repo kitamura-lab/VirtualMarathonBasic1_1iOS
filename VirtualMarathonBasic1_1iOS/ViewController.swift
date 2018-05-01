@@ -9,11 +9,14 @@
 import UIKit
 import GoogleMaps
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, GMSMapViewDelegate {
     
     // You don't need to modify the default init(nibName:bundle:) method.
-    
-    var mapView: GMSMapView!
+
+    @IBOutlet weak var mapView: GMSMapView!
+    @IBOutlet weak var button: UIButton!
+    @IBOutlet weak var label: UILabel!
+    @IBOutlet weak var dlabel: UILabel!
     
     var locationManager: CLLocationManager!
     var currentLocation: CLLocation?
@@ -22,24 +25,21 @@ class ViewController: UIViewController {
     
     let cm = CourseManager()
     
-    let label = UILabel()
-    let dlabel = UILabel()
-    
-    let button = UIButton()
-    
     var flag = false
     var timer: Timer!
     var startTime = Date()
     
-    override func loadView() {
-
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
         let cm = CourseManager()
         print("CourseManager: \(totalDistance)")
         let current = cm.getLocation(dis: totalDistance)
         
-        let camera = GMSCameraPosition.camera(withLatitude: current.coordinate.latitude, longitude: current.coordinate.longitude, zoom: 17.0)
-        mapView = GMSMapView.map(withFrame: CGRect.zero, camera: camera)
+        mapView.isMyLocationEnabled = true
         
+        let camera = GMSCameraPosition.camera(withLatitude: current.coordinate.latitude, longitude: current.coordinate.longitude, zoom: 17.0)
+        mapView.camera = camera
         
         let path = GMSMutablePath()
         let course = cm.getCourse()
@@ -55,40 +55,15 @@ class ViewController: UIViewController {
         let marker = GMSMarker(position: position)
         marker.title = "Here"
         marker.map = mapView
-        
-        mapView.isMyLocationEnabled = true
-        view = mapView
-        
-        label.text = "00:00:00"
-        //label.sizeToFit()
-        //label.frame.origin = CGPoint(x: 100, y: 30)
-        label.frame = CGRect(x:130, y:30, width:100, height:30);
-        label.backgroundColor = UIColor.white
-        view.addSubview(label)
-        
-        dlabel.text = "000.00"
-        //dlabel.sizeToFit()
-        //dlabel.frame.origin = CGPoint(x: 200, y: 30)
-        dlabel.frame = CGRect(x:240, y:30, width:100, height:30);
-        dlabel.backgroundColor = UIColor.white
-        view.addSubview(dlabel)
-        
+
+        label.text = "時間: 00:00:00"
+        dlabel.text = "距離: 000.00"
         button.setTitle("START", for: .normal)
-        button.backgroundColor = UIColor.white
-        button.setTitleColor(UIColor.black, for: .normal)
-        button.frame = CGRect(x:20, y:30, width:100, height:30);
-        //button.sizeToFit()
-        //button.frame.origin = CGPoint(x: 20, y: 30)
+        button.backgroundColor = UIColor.lightGray
         button.addTarget(self, action: #selector(buttonEvent(sender:)), for: .touchUpInside)
-        view.addSubview(button)
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
+
         locationManager = CLLocationManager() // インスタンスの生成
         locationManager.delegate = self // CLLocationManagerDelegateプロトコルを実装するクラスを指定する
-        
     }
     
     func startTimer() {
@@ -118,9 +93,6 @@ class ViewController: UIViewController {
     
     @objc func timerCounter() {
         
-        //if flag == 0 {return}
-        //let now = Date()
-        
         let currentTime = Date().timeIntervalSince(startTime)
         
         // fmod() 余りを計算
@@ -135,7 +107,7 @@ class ViewController: UIViewController {
         let sSecond = String(format:"%02d", second)
         let sMsec = String(format:"%02d", msec)
         
-        label.text = sMinute+":"+sSecond+":"+sMsec
+        label.text = "時間: "+sMinute+":"+sSecond+":"+sMsec
     }
 
 }
@@ -180,17 +152,14 @@ extension ViewController: CLLocationManagerDelegate {
             
             if lastLocation == nil {
                 lastLocation = currentLocation;
-                //return;
             }
             let distance = currentLocation?.distance(from: lastLocation!)
             totalDistance += distance!
             
-            //let cm = CourseManager()
             print("CourseManager: \(totalDistance)")
             let current = cm.getLocation(dis: totalDistance)
         
             let camera = GMSCameraPosition.camera(withLatitude: current.coordinate.latitude, longitude: current.coordinate.longitude, zoom: 17.0)
-            //mapView = GMSMapView.map(withFrame: CGRect.zero, camera: camera)
             mapView.camera = camera
             
             let position = CLLocationCoordinate2D(latitude: current.coordinate.latitude, longitude: current.coordinate.longitude)
@@ -198,17 +167,14 @@ extension ViewController: CLLocationManagerDelegate {
             marker.title = "Here"
             marker.map = mapView
             
-            //mapView.isMyLocationEnabled = true
-            view = mapView
-            
-            dlabel.text = String(format:"%.2f", totalDistance)
+            //view = mapView
+            dlabel.text = "距離: "+String(format:"%.2f", totalDistance)
         }
     }
     
     @objc func buttonEvent(sender: UIButton) {
         print("ボタンが押された")
         print("このメソッドを呼び出したボタンの情報: \(sender)")
-        //startTimer()
         if flag==false {
             flag = true
             startTimer()
